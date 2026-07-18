@@ -1,81 +1,79 @@
 # DuoNow
 
-실력과 플레이 스타일이 맞는 게이머를 찾기 위한 듀오 매칭 웹앱입니다.
+실력과 플레이 스타일이 맞는 게이머를 찾기 위한 Flutter + Firebase 듀오 매칭 앱입니다.
 
 ## 핵심 기능
 
 - 이메일 로그인 / 회원가입
-- Google OAuth 로그인
+- Google 로그인
 - 휴대폰 OTP 로그인
 - 로그인 사용자 프로필 조회 및 저장
 
 ## 기술 스택
 
-- React 19 + Vite 8
-- React Router 7
-- Supabase Auth / Database
-- Tailwind CSS 4
-- Oxlint
+- Flutter
+- Firebase Authentication
+- Firebase Realtime Database
 
 ## 시작하기
 
-### 1. 의존성 설치
+### 1. Flutter 설치 확인
 
 ```powershell
-npm install
+flutter --version
 ```
 
-### 2. 환경변수 설정
+### 2. Firebase 연결
 
-프로젝트 루트에 `.env.local` 파일을 만들고 값을 입력하세요.
-
-```env
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### 3. 개발 서버 실행
+가장 쉬운 방법은 `flutterfire configure`를 쓰는 것입니다. 이 레포는 `dart-define` 방식도 지원합니다.
 
 ```powershell
-npm run dev
+dart pub global activate flutterfire_cli
+flutterfire configure
 ```
 
-## 스크립트
+직접 실행할 경우 `flutter run` 뒤에 Firebase 값들을 넘기세요.
 
-- `npm run dev`: 개발 서버 실행
-- `npm run build`: 프로덕션 빌드
-- `npm run preview`: 빌드 결과 미리보기
-- `npm run lint`: 코드 린트
-- `npm run test`: 테스트 실행
-- `npm run test:watch`: 테스트 감시 모드
+```powershell
+flutter run --dart-define=FIREBASE_API_KEY=... --dart-define=FIREBASE_APP_ID=... --dart-define=FIREBASE_MESSAGING_SENDER_ID=... --dart-define=FIREBASE_PROJECT_ID=...
+```
+
+현재 기본 프로젝트 ID는 `duonow-cabda`로 맞춰 두었습니다.
+
+### 3. 의존성 설치
+
+```powershell
+flutter pub get
+```
+
+### 4. 앱 실행
+
+```powershell
+flutter run
+```
 
 ## 프로젝트 구조
 
 ```text
-src/
-	components/
-		AuthForm.jsx
-		AuthForm.test.jsx
-		ProfileForm.jsx
-	test/
-		setup.js
-	services/
-		supabase.js
-	App.jsx
-	main.jsx
+lib/
+	main.dart
+	src/
+		app.dart
+		theme.dart
+		firebase_options.dart
+		models/
+			profile.dart
+		screens/
+			auth_screen.dart
+			profile_screen.dart
+		services/
+			auth_service.dart
+			profile_service.dart
 ```
 
-## Supabase 테이블 가이드
+## Firebase 설정 메모
 
-`profiles` 테이블 예시 컬럼:
-
-- `id` (uuid, auth.users.id와 동일)
-- `nickname` (text)
-- `game` (text)
-- `tier` (text)
-- `play_style` (text)
-- `updated_at` (timestamp)
-
-운영 환경에서는 RLS(Row Level Security) 정책을 반드시 적용하세요.
-
-샘플 정책 파일: `supabase/profiles_rls.sql`
+- Authentication에서 Email/Password, Google, Phone 제공자를 활성화하세요.
+- Realtime Database에 `profiles/{uid}` 경로를 저장하도록 구성했습니다.
+- 실제 서비스에서는 Realtime Database 보안 규칙으로 각 사용자가 자신의 프로필만 읽고 쓰도록 제한하세요.
+- Realtime Database 규칙은 [database.rules.json](database.rules.json)에 들어 있습니다.
