@@ -2,52 +2,44 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 class DefaultFirebaseOptions {
-  static const String apiKey = String.fromEnvironment('FIREBASE_API_KEY', defaultValue: '');
-  static const String appId = String.fromEnvironment('FIREBASE_APP_ID', defaultValue: '');
-  static const String messagingSenderId = String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID', defaultValue: '');
-  static const String projectId = String.fromEnvironment('FIREBASE_PROJECT_ID', defaultValue: 'duonow-cabda');
-  static const String authDomain = String.fromEnvironment('FIREBASE_AUTH_DOMAIN', defaultValue: '');
-  static const String storageBucket = String.fromEnvironment('FIREBASE_STORAGE_BUCKET', defaultValue: '');
-  static const String measurementId = String.fromEnvironment('FIREBASE_MEASUREMENT_ID', defaultValue: '');
-  static const String iosBundleId = String.fromEnvironment('FIREBASE_IOS_BUNDLE_ID', defaultValue: '');
-
-  static bool get isConfigured => apiKey.isNotEmpty && appId.isNotEmpty && messagingSenderId.isNotEmpty && projectId.isNotEmpty;
-
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: apiKey,
-    appId: appId,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    authDomain: authDomain,
-    storageBucket: storageBucket,
-    measurementId: measurementId,
+    apiKey: 'AIzaSyC3sWejAB1_9uqbhTpWjaKcyHAW-U_8ei8',
+    appId: '1:760672931872:web:e1dc64665662b900af2c45',
+    messagingSenderId: '760672931872',
+    projectId: 'duonow-cabda',
+    authDomain: 'duonow-cabda.firebaseapp.com',
+    storageBucket: 'duonow-cabda.firebasestorage.app',
+    measurementId: 'G-S38ZESHY9K',
+    databaseURL: 'https://duonow-cabda-default-rtdb.asia-southeast1.firebasedatabase.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: apiKey,
-    appId: appId,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    storageBucket: storageBucket,
+    apiKey: 'AIzaSyC3sWejAB1_9uqbhTpWjaKcyHAW-U_8ei8',
+    appId: '1:760672931872:web:e1dc64665662b900af2c45',
+    messagingSenderId: '760672931872',
+    projectId: 'duonow-cabda',
+    storageBucket: 'duonow-cabda.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: apiKey,
-    appId: appId,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    storageBucket: storageBucket,
-    iosBundleId: iosBundleId,
+    apiKey: 'AIzaSyC3sWejAB1_9uqbhTpWjaKcyHAW-U_8ei8',
+    appId: '1:760672931872:web:e1dc64665662b900af2c45',
+    messagingSenderId: '760672931872',
+    projectId: 'duonow-cabda',
+    storageBucket: 'duonow-cabda.firebasestorage.app',
+    iosBundleId: 'com.example.duonow',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: apiKey,
-    appId: appId,
-    messagingSenderId: messagingSenderId,
-    projectId: projectId,
-    storageBucket: storageBucket,
-    iosBundleId: iosBundleId,
+    apiKey: 'AIzaSyC3sWejAB1_9uqbhTpWjaKcyHAW-U_8ei8',
+    appId: '1:760672931872:web:e1dc64665662b900af2c45',
+    messagingSenderId: '760672931872',
+    projectId: 'duonow-cabda',
+    storageBucket: 'duonow-cabda.firebasestorage.app',
+    iosBundleId: 'com.example.duonow',
   );
+
+  static bool get isConfigured => true;
 
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {

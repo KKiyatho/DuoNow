@@ -7,11 +7,9 @@ import 'src/firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (DefaultFirebaseOptions.isConfigured) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  runApp(DuoNowApp(firebaseConfigured: DefaultFirebaseOptions.isConfigured));
+  runApp(const DuoNowApp(firebaseConfigured: true));
 }
