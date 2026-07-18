@@ -8,6 +8,10 @@
 - Google 로그인
 - 휴대폰 OTP 로그인
 - 로그인 사용자 프로필 조회 및 저장
+- 프로필 저장 후 게임 선택 홈 그리드로 이동
+- RTDB 기반 듀오 매칭 대기열 및 활성 매칭 화면
+- 실시간 채팅, 닉네임 복사, 매너 평가
+- 저트래픽 폴백 매칭 안내
 
 ## 기술 스택
 
@@ -25,20 +29,9 @@ flutter --version
 
 ### 2. Firebase 연결
 
-가장 쉬운 방법은 `flutterfire configure`를 쓰는 것입니다. 이 레포는 `dart-define` 방식도 지원합니다.
+Firebase 웹 설정은 코드에 이미 반영되어 있어서, 지금은 바로 실행할 수 있습니다.
 
-```powershell
-dart pub global activate flutterfire_cli
-flutterfire configure
-```
-
-직접 실행할 경우 `flutter run` 뒤에 Firebase 값들을 넘기세요.
-
-```powershell
-flutter run --dart-define=FIREBASE_API_KEY=... --dart-define=FIREBASE_APP_ID=... --dart-define=FIREBASE_MESSAGING_SENDER_ID=... --dart-define=FIREBASE_PROJECT_ID=...
-```
-
-현재 기본 프로젝트 ID는 `duonow-cabda`로 맞춰 두었습니다.
+필요하면 `flutterfire configure`로 다시 생성할 수 있지만, 필수는 아닙니다.
 
 ### 3. 의존성 설치
 
@@ -75,5 +68,7 @@ lib/
 
 - Authentication에서 Email/Password, Google, Phone 제공자를 활성화하세요.
 - Realtime Database에 `profiles/{uid}` 경로를 저장하도록 구성했습니다.
+- 게임 선택과 매칭 흐름은 `matchQueue/{uid}`, `activeMatches/{uid}`, `matchMessages/{matchId}`, `matchRatings/{matchId}`를 사용합니다.
+- 매칭 허브는 `matchQueue/{uid}`와 `activeMatches/{uid}`를 사용합니다.
 - 실제 서비스에서는 Realtime Database 보안 규칙으로 각 사용자가 자신의 프로필만 읽고 쓰도록 제한하세요.
 - Realtime Database 규칙은 [database.rules.json](database.rules.json)에 들어 있습니다.

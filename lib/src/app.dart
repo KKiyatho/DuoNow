@@ -1,8 +1,13 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'models/profile.dart';
 import 'screens/auth_screen.dart';
+import 'screens/duo_flow_screen.dart';
 import 'screens/profile_screen.dart';
+import 'services/notification_service.dart';
+import 'services/profile_service.dart';
 import 'theme.dart';
 
 class DuoNowApp extends StatelessWidget {
@@ -38,7 +43,23 @@ class _AuthGate extends StatelessWidget {
           return const AuthScreen();
         }
 
-        return ProfileScreen(user: user);
+        NotificationService.instance.bindUser(user.uid);
+
+        return StreamBuilder<Profile?>(
+          stream: ProfileService(FirebaseDatabase.instance).watchProfile(user.uid),
+          builder: (context, profileSnapshot) {
+            if (profileSnapshot.connectionState == ConnectionState.waiting) {
+              return const _LoadingScreen();
+            }
+
+            final profile = profileSnapshot.data;
+            if (profile == null) {
+              return ProfileScreen(user: user);
+            }
+
+            return DuoFlowScreen(user: user, profile: profile);
+          },
+        );
       },
     );
   }

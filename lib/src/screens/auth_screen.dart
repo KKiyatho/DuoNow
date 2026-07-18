@@ -165,9 +165,17 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton(
+                      child: OutlinedButton.icon(
                         onPressed: _busy ? null : _submitGoogle,
-                        child: const Text('Google로 계속하기'),
+                        icon: const _GoogleLogoMark(size: 20),
+                        label: const Text('Google로 계속하기'),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1F1F1F),
+                          side: const BorderSide(color: Color(0xFFDADCE0)),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -229,4 +237,100 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
+}
+
+class _GoogleLogoMark extends StatelessWidget {
+  const _GoogleLogoMark({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: _GoogleLogoPainter(),
+      ),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final outerRadius = size.shortestSide * 0.42;
+    final ringWidth = size.shortestSide * 0.16;
+
+    final clipRect = Rect.fromCircle(center: center, radius: outerRadius + ringWidth);
+
+    canvas.save();
+    canvas.clipRect(clipRect);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: outerRadius),
+      -0.75,
+      1.48,
+      false,
+      Paint()
+        ..color = const Color(0xFF4285F4)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = ringWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: outerRadius),
+      0.78,
+      1.36,
+      false,
+      Paint()
+        ..color = const Color(0xFF34A853)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = ringWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: outerRadius),
+      2.14,
+      1.12,
+      false,
+      Paint()
+        ..color = const Color(0xFFFBBC05)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = ringWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: outerRadius),
+      -3.12,
+      1.0,
+      false,
+      Paint()
+        ..color = const Color(0xFFEA4335)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = ringWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.restore();
+
+    final erasePaint = Paint()..color = Colors.white;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(center.dx + outerRadius * 0.05, center.dy - ringWidth * 0.65, outerRadius * 0.95, ringWidth * 1.3),
+        Radius.circular(ringWidth * 0.6),
+      ),
+      erasePaint,
+    );
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(center.dx + outerRadius * 0.04, center.dy - ringWidth * 0.27, outerRadius * 0.62, ringWidth * 0.54),
+        Radius.circular(ringWidth * 0.25),
+      ),
+      Paint()..color = const Color(0xFF4285F4),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

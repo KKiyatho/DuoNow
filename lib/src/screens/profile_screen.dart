@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +26,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _gameController = TextEditingController();
   final _tierController = TextEditingController();
   final _playStyleController = TextEditingController();
+  final _avatarUrlController = TextEditingController();
   StreamSubscription? _profileSubscription;
   bool _loading = true;
   bool _saving = false;
   String? _error;
   String? _message;
+
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) {
+      return;
+    }
+
+    final file = result.files.first;
+    final bytes = file.bytes;
+    if (bytes == null || bytes.isEmpty) {
+      return;
+    }
+
+    final ext = (file.extension ?? 'png').toLowerCase();
+    final mime = ext == 'jpg' ? 'jpeg' : ext;
+    final dataUrl = 'data:image/$mime;base64,${base64Encode(bytes)}';
+    setState(() {
+      _avatarUrlController.text = dataUrl;
+    });
+  }
+
+  ImageProvider? _avatarProvider(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return null;
+    }
+
+    if (trimmed.startsWith('data:image') && trimmed.contains(',')) {
+      final comma = trimmed.indexOf(',');
+      if (comma > -1) {
+        try {
+          return MemoryImage(base64Decode(trimmed.substring(comma + 1)));
+        } catch (_) {
+          return null;
+        }
+      }
+    }
+
+    return NetworkImage(trimmed);
+  }
 
   @override
   void initState() {
@@ -45,6 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _gameController.text = profile.game;
       _tierController.text = profile.tier;
       _playStyleController.text = profile.playStyle;
+      _avatarUrlController.text = profile.avatarUrl;
 
       if (mounted) {
         setState(() => _loading = false);
@@ -59,10 +106,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _gameController.dispose();
     _tierController.dispose();
     _playStyleController.dispose();
+    _avatarUrlController.dispose();
     super.dispose();
   }
 
   Future<void> _saveProfile() async {
+    final profile = Profile(
+      nickname: _nicknameController.text.trim(),
+      game: _gameController.text.trim(),
+      tier: _tierController.text.trim(),
+      playStyle: _playStyleController.text.trim(),
+      avatarUrl: _avatarUrlController.text.trim(),
+    );
+
     setState(() {
       _saving = true;
       _error = null;
@@ -70,16 +126,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      await _profileService.saveProfile(
-        widget.user.uid,
-        Profile(
-          nickname: _nicknameController.text.trim(),
-          game: _gameController.text.trim(),
-          tier: _tierController.text.trim(),
-          playStyle: _playStyleController.text.trim(),
-        ),
-      );
-      setState(() => _message = '프로필이 저장되었습니다.');
+      await _profileService.saveProfile(widget.user.uid, profile);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _message = '프로필 저장이 완료되었습니다.');
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop(profile);
+      }
     } catch (error) {
       setState(() => _error = error.toString());
     } finally {
@@ -131,8 +186,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Center(child: CircularProgressIndicator()),
                       )
                     else ...[
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: const Color(0xFF22314C),
+                            backgroundImage: _avatarProvider(_avatarUrlController.text),
+                            child: _avatarUrlController.text.trim().isEmpty
+                                ? Text(
+                                    (_nicknameController.text.trim().isEmpty ? 'U' : _nicknameController.text.trim().substring(0, 1)).toUpperCase(),
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('프로필 이미지'),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    FilledButton.tonal(
+                                      onPressed: _pickImage,
+                                      child: const Text('사진 업로드'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    TextButton(
+                                      onPressed: () => setState(() => _avatarUrlController.clear()),
+                                      child: const Text('초기화'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _avatarUrlController,
+                        decoration: const InputDecoration(
+                          labelText: '프로필 이미지 URL',
+                          hintText: 'https://.../avatar.png',
+                        ),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                      const SizedBox(height: 12),
                       TextField(
                         controller: _nicknameController,
+                        onChanged: (_) => setState(() {}),
                         decoration: const InputDecoration(labelText: '닉네임'),
                       ),
                       const SizedBox(height: 12),
@@ -156,18 +259,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           hintText: '예: 공격적, 오더 가능',
                         ),
                       ),
+                      const SizedBox(height: 12),
                       const SizedBox(height: 16),
                       if (_error != null)
                         Text(_error!, style: const TextStyle(color: Color(0xFFFF8D8D))),
                       if (_message != null)
                         Text(_message!, style: const TextStyle(color: Color(0xFF8DE4B3))),
                       const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: _saving ? null : _saveProfile,
-                          child: Text(_saving ? '저장 중...' : '프로필 저장'),
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _saving
+                                  ? null
+                                  : () async {
+                                      if (Navigator.of(context).canPop()) {
+                                        Navigator.of(context).pop();
+                                      } else {
+                                        await _authService.signOut();
+                                      }
+                                    },
+                              child: const Text('취소'),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: _saving ? null : _saveProfile,
+                              child: Text(_saving ? '저장 중...' : '프로필 저장'),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ],
@@ -180,3 +302,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

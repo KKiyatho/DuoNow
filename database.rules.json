@@ -5,6 +5,48 @@
         ".read": "auth != null && auth.uid === $userId",
         ".write": "auth != null && auth.uid === $userId"
       }
+    },
+    "matchQueue": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["game", "requestedAt"]
+    },
+    "activeMatches": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "matchHistory": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId",
+        ".indexOn": ["updatedAt", "createdAt"]
+      }
+    },
+    "notifications": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId",
+        ".indexOn": ["createdAt", "read"]
+      }
+    },
+    "deviceTokens": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId"
+      }
+    },
+    "communityPosts": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["game", "createdAt", "status"]
+    },
+    "matchMessages": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "matchRatings": {
+      ".read": "auth != null",
+      ".write": "auth != null"
     }
   }
 }

@@ -7,9 +7,11 @@
       "name": "duonow",
       "version": "1.0.0+1",
       "dependencies": [
+        "file_picker",
         "firebase_auth",
         "firebase_core",
         "firebase_database",
+        "firebase_messaging",
         "flutter",
         "google_sign_in",
         "intl"
@@ -62,6 +64,34 @@
         "google_sign_in_ios",
         "google_sign_in_platform_interface",
         "google_sign_in_web"
+      ]
+    },
+    {
+      "name": "file_picker",
+      "version": "10.3.10",
+      "dependencies": [
+        "cross_file",
+        "dbus",
+        "ffi",
+        "flutter",
+        "flutter_plugin_android_lifecycle",
+        "flutter_web_plugins",
+        "path",
+        "plugin_platform_interface",
+        "web",
+        "win32"
+      ]
+    },
+    {
+      "name": "firebase_messaging",
+      "version": "15.2.10",
+      "dependencies": [
+        "firebase_core",
+        "firebase_core_platform_interface",
+        "firebase_messaging_platform_interface",
+        "firebase_messaging_web",
+        "flutter",
+        "meta"
       ]
     },
     {
@@ -235,6 +265,98 @@
       ]
     },
     {
+      "name": "dbus",
+      "version": "0.7.14",
+      "dependencies": [
+        "args",
+        "ffi",
+        "meta",
+        "xml"
+      ]
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.5+4",
+      "dependencies": [
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "win32",
+      "version": "5.15.0",
+      "dependencies": [
+        "ffi"
+      ]
+    },
+    {
+      "name": "ffi",
+      "version": "2.2.0",
+      "dependencies": []
+    },
+    {
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.35",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "firebase_messaging_web",
+      "version": "3.10.10",
+      "dependencies": [
+        "_flutterfire_internals",
+        "firebase_core",
+        "firebase_core_web",
+        "firebase_messaging_platform_interface",
+        "flutter",
+        "flutter_web_plugins",
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "firebase_messaging_platform_interface",
+      "version": "4.6.10",
+      "dependencies": [
+        "_flutterfire_internals",
+        "firebase_core",
+        "flutter",
+        "meta",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "firebase_core_platform_interface",
+      "version": "6.0.3",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "flutter_test",
+        "meta",
+        "plugin_platform_interface"
+      ]
+    },
+    {
       "name": "firebase_database_web",
       "version": "0.2.6+16",
       "dependencies": [
@@ -254,17 +376,6 @@
         "collection",
         "firebase_core",
         "flutter",
-        "meta",
-        "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "firebase_core_platform_interface",
-      "version": "6.0.3",
-      "dependencies": [
-        "collection",
-        "flutter",
-        "flutter_test",
         "meta",
         "plugin_platform_interface"
       ]
@@ -381,11 +492,6 @@
       ]
     },
     {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
-    },
-    {
       "name": "http",
       "version": "1.6.0",
       "dependencies": [
@@ -404,18 +510,18 @@
       ]
     },
     {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
+      "name": "xml",
+      "version": "6.6.1",
       "dependencies": [
-        "flutter"
+        "collection",
+        "meta",
+        "petitparser"
       ]
     },
     {
-      "name": "plugin_platform_interface",
-      "version": "2.1.8",
-      "dependencies": [
-        "meta"
-      ]
+      "name": "args",
+      "version": "2.7.0",
+      "dependencies": []
     },
     {
       "name": "_flutterfire_internals",
@@ -442,6 +548,14 @@
       "name": "vm_service",
       "version": "15.2.0",
       "dependencies": []
+    },
+    {
+      "name": "petitparser",
+      "version": "7.0.2",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
     },
     {
       "name": "typed_data",
