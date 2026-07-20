@@ -1,74 +1,216 @@
 # DuoNow
 
-실력과 플레이 스타일이 맞는 게이머를 찾기 위한 Flutter + Firebase 듀오 매칭 앱입니다.
+> **"한 판 같이할 듀오, 지금 바로."**  
+> 실력과 플레이 스타일이 맞는 게이머를 빠르게 연결하는 실시간 듀오 매칭 플랫폼
+
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20RTDB-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
+
+---
+
+## 앱 소개
+
+**DuoNow**는 게임별/티어별/플레이 스타일 기반으로 듀오를 연결해주는 Flutter 앱입니다.  
+단순한 매칭을 넘어, 실시간 채팅, 커뮤니티 모집글, 알림 센터, 매칭 히스토리까지 하나의 흐름으로 제공합니다.
+
+### 핵심 가치
+- **빠른 매칭 경험**: 조건 기반 큐 탐색으로 즉시 매칭 시도
+- **실시간 소통**: 매칭 후 채팅방 자동 연결
+- **유연한 탐색**: 티어 인접 허용, 플레이 스타일 완화 등 저트래픽 폴백
+- **커뮤니티 확장**: 모집글 기반 직접 듀오 전환
+
+---
 
 ## 핵심 기능
 
-- 이메일 로그인 / 회원가입
-- Google 로그인
-- 휴대폰 OTP 로그인
-- 로그인 사용자 프로필 조회 및 저장
-- 프로필 저장 후 게임 선택 홈 그리드로 이동
-- RTDB 기반 듀오 매칭 대기열 및 활성 매칭 화면
-- 실시간 채팅, 닉네임 복사, 매너 평가
-- 저트래픽 폴백 매칭 안내
+### 1) 인증
+```text
+Email / Google / Phone(OTP) 로그인 지원
+├─ 이메일 회원가입 & 로그인
+├─ Google OAuth 로그인
+└─ 휴대폰 인증번호(OTP) 기반 로그인
+```
+
+### 2) 프로필
+```text
+매칭 품질을 높이는 유저 정보 관리
+├─ 닉네임, 게임, 티어, 플레이 스타일 저장
+├─ 아바타 URL 입력 또는 이미지 업로드
+└─ 사용자별 프로필 실시간 조회/수정
+```
+
+### 3) 매칭
+```text
+RTDB 기반 실시간 듀오 매칭
+├─ matchQueue: 대기열 등록
+├─ activeMatches: 활성 매칭 상태 관리
+├─ 티어/스타일 조건 비교
+└─ 저트래픽 시 완화 조건 + 예약 알림 흐름
+```
+
+### 4) 채팅 & 매너 평가
+```text
+매칭 직후 바로 대화 시작
+├─ matchMessages 실시간 채팅
+├─ 닉네임 복사 UX
+└─ matchRatings 기반 매너 평가 저장
+```
+
+### 5) 커뮤니티 & 알림
+```text
+같이할 사람을 먼저 찾는 커뮤니티 허브
+├─ 모집글 작성 / 수정 / 삭제
+├─ 지원자 신청, 수락/거절
+├─ 수락 시 직접 매칭 생성
+└─ notifications로 이벤트 알림 누적
+```
+
+---
+
+## 스크린샷
+
+### 홈 화면
+![홈 화면]()
+
+### 매칭 화면
+![매칭 화면]()
+
+### 채팅 화면
+![채팅 화면]()
+
+### 커뮤니티 화면
+![커뮤니티 화면]()
+
+> 이미지 주소는 위 괄호 `()` 안에 넣어주세요.
+
+---
 
 ## 기술 스택
 
-- Flutter
-- Firebase Authentication
-- Firebase Realtime Database
+| 계층 | 기술 |
+|------|------|
+| Frontend | Flutter (Dart) |
+| 인증 | Firebase Authentication |
+| 실시간 DB | Firebase Realtime Database |
+| 푸시/토큰 | Firebase Messaging |
+| 파일 선택 | file_picker |
+| 소셜 로그인 | google_sign_in |
 
-## 시작하기
+---
 
-### 1. Flutter 설치 확인
+## 데이터 구조
 
-```powershell
-flutter --version
+```text
+profiles/{uid}
+matchQueue/{uid}
+activeMatches/{uid}
+matchHistory/{uid}/{matchId}
+matchMessages/{matchId}/{messageId}
+matchRatings/{matchId}/{raterId}
+communityPosts/{postId}
+notifications/{uid}/{notificationId}
+deviceTokens/{uid}/{tokenKey}
 ```
 
-### 2. Firebase 연결
-
-Firebase 웹 설정은 코드에 이미 반영되어 있어서, 지금은 바로 실행할 수 있습니다.
-
-필요하면 `flutterfire configure`로 다시 생성할 수 있지만, 필수는 아닙니다.
-
-### 3. 의존성 설치
-
-```powershell
-flutter pub get
-```
-
-### 4. 앱 실행
-
-```powershell
-flutter run
-```
+---
 
 ## 프로젝트 구조
 
 ```text
 lib/
-	main.dart
-	src/
-		app.dart
-		theme.dart
-		firebase_options.dart
-		models/
-			profile.dart
-		screens/
-			auth_screen.dart
-			profile_screen.dart
-		services/
-			auth_service.dart
-			profile_service.dart
+  main.dart
+  src/
+    app.dart
+    theme.dart
+    firebase_options.dart
+    models/
+      chat_message.dart
+      match_session.dart
+      profile.dart
+    screens/
+      auth_screen.dart
+      duo_flow_screen.dart
+      profile_screen.dart
+    services/
+      auth_service.dart
+      chat_service.dart
+      match_service.dart
+      notification_service.dart
+      profile_service.dart
+database.rules.json
+firebase.json
 ```
+
+---
+
+## 로컬 실행
+
+### 요구사항
+- Flutter SDK
+- Firebase 프로젝트 (Auth + Realtime Database 활성화)
+
+### 설치
+```bash
+flutter pub get
+```
+
+### 실행
+```bash
+flutter run -d chrome
+```
+
+### 빌드
+```bash
+flutter build web
+```
+
+### 분석 / 테스트
+```bash
+flutter analyze
+flutter test
+```
+
+---
 
 ## Firebase 설정 메모
 
-- Authentication에서 Email/Password, Google, Phone 제공자를 활성화하세요.
-- Realtime Database에 `profiles/{uid}` 경로를 저장하도록 구성했습니다.
-- 게임 선택과 매칭 흐름은 `matchQueue/{uid}`, `activeMatches/{uid}`, `matchMessages/{matchId}`, `matchRatings/{matchId}`를 사용합니다.
-- 매칭 허브는 `matchQueue/{uid}`와 `activeMatches/{uid}`를 사용합니다.
-- 실제 서비스에서는 Realtime Database 보안 규칙으로 각 사용자가 자신의 프로필만 읽고 쓰도록 제한하세요.
-- Realtime Database 규칙은 [database.rules.json](database.rules.json)에 들어 있습니다.
+- Authentication 제공자: Email/Password, Google, Phone 활성화
+- Realtime Database 규칙 파일: `database.rules.json`
+- 필요 시 설정 재생성:
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire configure
+```
+
+---
+
+## 로드맵
+
+### Phase 1
+- [x] 인증/프로필/실시간 매칭
+- [x] 실시간 채팅
+- [x] 커뮤니티 모집글
+- [x] 알림 센터
+
+### Phase 2
+- [ ] 매칭 정확도 개선(조건 가중치)
+- [ ] 사용자 차단/신고 기능
+- [ ] 커뮤니티 댓글/답글
+- [ ] 푸시 알림 고도화
+
+### Phase 3
+- [ ] 게임별 확장 데이터(포지션, 선호 시간대)
+- [ ] 추천 기반 자동 듀오 제안
+- [ ] 웹/모바일 배포 파이프라인 자동화
+
+---
+
+## 👤 개발자
+
+**최민준** (KKiyatho)  
+- GitHub: [@KKiyatho](https://github.com/KKiyatho)
+- Email: hellochoi1016@gmail.com
+
+**Made by 최민준**
