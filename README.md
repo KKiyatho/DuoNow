@@ -70,19 +70,17 @@ RTDB 기반 실시간 듀오 매칭
 
 ## 스크린샷
 
-### 홈 화면
-![홈 화면]()
+### 로그인 화면
+![홈 화면](<img width="1920" height="941" alt="스크린샷 2026-07-20 145932" src="https://github.com/user-attachments/assets/012f248b-e531-40ba-9ca3-fa61918e3030" />
+)
 
 ### 매칭 화면
-![매칭 화면]()
-
-### 채팅 화면
-![채팅 화면]()
+![매칭 화면](<img width="1920" height="943" alt="스크린샷 2026-07-20 150033" src="https://github.com/user-attachments/assets/72e2f7e7-4f73-4c8d-8e0b-3b82ab065635" />
+)
 
 ### 커뮤니티 화면
-![커뮤니티 화면]()
-
-> 이미지 주소는 위 괄호 `()` 안에 넣어주세요.
+![커뮤니티 화면](<img width="1920" height="944" alt="스크린샷 2026-07-20 150240" src="https://github.com/user-attachments/assets/536a84e7-1723-4718-b395-30b243fa8d8f" />
+)
 
 ---
 
