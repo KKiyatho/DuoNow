@@ -176,7 +176,7 @@ flutter build web
 - PR 종료 시 Preview 환경 자동 정리
 - `workflow_dispatch`로 수동 실행 가능
 - 품질 게이트: `flutter analyze` + `flutter test`
-- 보안 게이트: Trivy 기반 OWASP 관점 스캔(vuln/secret/misconfig)
+- 보안 게이트: Trivy 기반 OWASP 관점 스캔(vuln/misconfig/secret)
 - `flutter build web --release` 결과를 Azure Static Web Apps로 배포
 - 동일 브랜치 중복 실행은 자동 취소(concurrency)
 
@@ -187,7 +187,8 @@ flutter build web
   - `AZURE_STATIC_WEB_APPS_API_TOKEN`
 
 참고:
-- 워크플로의 Trivy 보안 스캔에서 High/Critical 취약점이 검출되면 배포가 차단됩니다.
+- 워크플로의 Trivy 보안 스캔에서 `HIGH/CRITICAL` 취약점(vuln/misconfig)이 검출되면 배포가 차단됩니다.
+- secret 스캔은 리포트 전용으로 실행되어 결과를 확인할 수 있습니다.
 - `test/` 폴더가 없으면 테스트 단계는 자동으로 스킵됩니다.
 
 ### 분석 / 테스트

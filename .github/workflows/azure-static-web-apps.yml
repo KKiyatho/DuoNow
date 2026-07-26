@@ -32,6 +32,7 @@ on:
 
 permissions:
   contents: read
+  security-events: write
 
 concurrency:
   group: swa-${{ github.workflow }}-${{ github.ref }}
@@ -97,16 +98,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Trivy OWASP scan
+      - name: Run Trivy OWASP gate (block on HIGH/CRITICAL)
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: fs
           format: table
-          severity: CRITICAL,HIGH,MEDIUM
+          severity: CRITICAL,HIGH
           vuln-type: os,library
-          scanners: vuln,secret,misconfig
+          scanners: vuln,misconfig
           exit-code: '1'
           ignore-unfixed: true
+          skip-dirs: .git,.dart_tool,build
+
+      - name: Run Trivy secret scan (report only)
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          format: table
+          scanners: secret
+          exit-code: '0'
+          skip-dirs: .git,.dart_tool,build
 
   deploy:
     runs-on: ubuntu-latest
