@@ -849,6 +849,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   late final Stream<List<ChatMessage>> _messagesStream;
   bool _sending = false;
   bool? _positiveRating;
+  bool _leavingMatch = false;
 
   @override
   void initState() {
@@ -972,197 +973,214 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
+  Future<void> _leaveMatchToHome() async {
+    if (_leavingMatch) {
+      return;
+    }
+
+    _leavingMatch = true;
+    await _matchService.endMatch(uid: widget.user.uid, partnerUid: widget.match.partnerId);
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          const _AtmosphereBackground(),
-          SafeArea(
-            child: Column(
-              children: [
-                _NeoTopBar(
-                  active: 'History',
-                  nickname: widget.profile.nickname,
-                  avatarUrl: widget.profile.avatarUrl,
-                  onHome: () => Navigator.of(context).popUntil((route) => route.isFirst),
-                  onProfile: _openProfile,
-                  onCommunity: _openCommunity,
-                  onHistory: _openHistory,
-                  onNotifications: _openNotifications,
-                  onSettings: _openSettings,
-                ),
-                Expanded(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1120),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-                        child: _GlassPanel(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('매칭 완료 및 채팅', style: Theme.of(context).textTheme.headlineMedium),
-                              const SizedBox(height: 10),
-                              Text('${widget.match.partnerNickname}님과 연결되었습니다.', style: const TextStyle(color: Color(0xFFC6C6CD))),
-                              const SizedBox(height: 10),
-                              Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                children: [
-                                  _StatChip(label: '게임', value: widget.match.game),
-                                  _StatChip(label: '상대 티어', value: widget.match.tier),
-                                  _StatChip(label: '성향', value: widget.match.playStyle),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text('상대 닉네임: ${widget.match.partnerNickname}', style: Theme.of(context).textTheme.titleLarge),
-                                  ),
-                                  TextButton(
-                                    onPressed: _copyNickname,
-                                    child: const Text('게임 닉네임 복사하기'),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF101B2D),
-                                    borderRadius: BorderRadius.circular(18),
-                                    border: Border.all(color: const Color(0xFF323537)),
-                                  ),
-                                  child: StreamBuilder<List<ChatMessage>>(
-                                    stream: _messagesStream,
-                                    builder: (context, snapshot) {
-                                      final messages = snapshot.data ?? const <ChatMessage>[];
-                                      return ListView.builder(
-                                        itemCount: messages.length,
-                                        itemBuilder: (context, index) {
-                                          final message = messages[index];
-                                          final isMine = message.senderId == widget.user.uid;
-                                          return Align(
-                                            alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
-                                            child: Container(
-                                              margin: const EdgeInsets.only(bottom: 10),
-                                              padding: const EdgeInsets.all(12),
-                                              constraints: const BoxConstraints(maxWidth: 420),
-                                              decoration: BoxDecoration(
-                                                color: isMine ? const Color(0xFF0566D9) : const Color(0xFF1A2436),
-                                                borderRadius: BorderRadius.circular(14),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment: isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(message.senderNickname, style: Theme.of(context).textTheme.labelLarge),
-                                                  const SizedBox(height: 4),
-                                                  Text(message.text),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) {
+          return;
+        }
+        await _leaveMatchToHome();
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            const _AtmosphereBackground(),
+            SafeArea(
+              child: Column(
+                children: [
+                  _NeoTopBar(
+                    active: 'History',
+                    nickname: widget.profile.nickname,
+                    avatarUrl: widget.profile.avatarUrl,
+                    onHome: _leaveMatchToHome,
+                    onProfile: _openProfile,
+                    onCommunity: _openCommunity,
+                    onHistory: _openHistory,
+                    onNotifications: _openNotifications,
+                    onSettings: _openSettings,
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1120),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+                          child: _GlassPanel(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('매칭 완료 및 채팅', style: Theme.of(context).textTheme.headlineMedium),
+                                const SizedBox(height: 10),
+                                Text('${widget.match.partnerNickname}님과 연결되었습니다.', style: const TextStyle(color: Color(0xFFC6C6CD))),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: [
+                                    _StatChip(label: '게임', value: widget.match.game),
+                                    _StatChip(label: '상대 티어', value: widget.match.tier),
+                                    _StatChip(label: '성향', value: widget.match.playStyle),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _textController,
-                                      decoration: const InputDecoration(
-                                        labelText: '실시간 텍스트',
-                                        hintText: '대화 내용을 입력하세요',
-                                      ),
-                                      minLines: 1,
-                                      maxLines: 3,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  FilledButton(
-                                    onPressed: _sending ? null : _send,
-                                    child: Text(_sending ? '전송 중' : '전송'),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF101B2D),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: const Color(0xFF323537)),
-                                ),
-                                child: Row(
+                                const SizedBox(height: 14),
+                                Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        _positiveRating == null ? '매너 평가를 남겨주세요.' : (_positiveRating == true ? '좋아요를 남겼습니다.' : '싫어요를 남겼습니다.'),
-                                        style: const TextStyle(color: Color(0xFFC6C6CD)),
-                                      ),
+                                      child: Text('상대 닉네임: ${widget.match.partnerNickname}', style: Theme.of(context).textTheme.titleLarge),
                                     ),
-                                    const SizedBox(width: 8),
-                                    FilledButton(
-                                      onPressed: _positiveRating == null ? () => _ratePartner(true) : null,
-                                      child: const Text('좋아요'),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    OutlinedButton(
-                                      onPressed: _positiveRating == null ? () => _ratePartner(false) : null,
-                                      child: const Text('싫어요'),
+                                    TextButton(
+                                      onPressed: _copyNickname,
+                                      child: const Text('게임 닉네임 복사하기'),
                                     ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    await _matchService.endMatch(uid: widget.user.uid, partnerUid: widget.match.partnerId);
-                                    if (!context.mounted) {
-                                      return;
-                                    }
-                                    Navigator.of(context).popUntil((route) => route.isFirst);
-                                  },
-                                  child: const Text('매칭 허브로 돌아가기'),
+                                const SizedBox(height: 12),
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF101B2D),
+                                      borderRadius: BorderRadius.circular(18),
+                                      border: Border.all(color: const Color(0xFF323537)),
+                                    ),
+                                    child: StreamBuilder<List<ChatMessage>>(
+                                      stream: _messagesStream,
+                                      builder: (context, snapshot) {
+                                        final messages = snapshot.data ?? const <ChatMessage>[];
+                                        return ListView.builder(
+                                          itemCount: messages.length,
+                                          itemBuilder: (context, index) {
+                                            final message = messages[index];
+                                            final isMine = message.senderId == widget.user.uid;
+                                            return Align(
+                                              alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(bottom: 10),
+                                                padding: const EdgeInsets.all(12),
+                                                constraints: const BoxConstraints(maxWidth: 420),
+                                                decoration: BoxDecoration(
+                                                  color: isMine ? const Color(0xFF0566D9) : const Color(0xFF1A2436),
+                                                  borderRadius: BorderRadius.circular(14),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(message.senderNickname, style: Theme.of(context).textTheme.labelLarge),
+                                                    const SizedBox(height: 4),
+                                                    Text(message.text),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: double.infinity,
-                                child: TextButton(
-                                  onPressed: () async {
-                                    await Clipboard.setData(ClipboardData(text: 'DuoNow/${widget.match.matchId}'));
-                                    if (!context.mounted) {
-                                      return;
-                                    }
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('친구 초대 링크용 코드를 복사했습니다.')),
-                                    );
-                                  },
-                                  child: const Text('친구 초대 링크 복사'),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _textController,
+                                        decoration: const InputDecoration(
+                                          labelText: '실시간 텍스트',
+                                          hintText: '대화 내용을 입력하세요',
+                                        ),
+                                        minLines: 1,
+                                        maxLines: 3,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    FilledButton(
+                                      onPressed: _sending ? null : _send,
+                                      child: Text(_sending ? '전송 중' : '전송'),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF101B2D),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: const Color(0xFF323537)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          _positiveRating == null ? '매너 평가를 남겨주세요.' : (_positiveRating == true ? '좋아요를 남겼습니다.' : '싫어요를 남겼습니다.'),
+                                          style: const TextStyle(color: Color(0xFFC6C6CD)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      FilledButton(
+                                        onPressed: _positiveRating == null ? () => _ratePartner(true) : null,
+                                        child: const Text('좋아요'),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      OutlinedButton(
+                                        onPressed: _positiveRating == null ? () => _ratePartner(false) : null,
+                                        child: const Text('싫어요'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton(
+                                    onPressed: _leaveMatchToHome,
+                                    child: const Text('매칭 허브로 돌아가기'),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                    onPressed: () async {
+                                      await Clipboard.setData(ClipboardData(text: 'DuoNow/${widget.match.matchId}'));
+                                      if (!context.mounted) {
+                                        return;
+                                      }
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('친구 초대 링크용 코드를 복사했습니다.')),
+                                      );
+                                    },
+                                    child: const Text('친구 초대 링크 복사'),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const _NeoFooter(),
-              ],
+                  const _NeoFooter(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1375,6 +1393,49 @@ class MatchHistoryScreen extends StatelessWidget {
   final Profile profile;
   final MatchService _matchService = MatchService(FirebaseDatabase.instance);
 
+  void _openChatFromHistory(BuildContext context, Map<String, dynamic> item) {
+    final status = (item['status'] as String?) ?? 'active';
+    if (status != 'active') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('종료된 매칭은 채팅방에 재입장할 수 없습니다.')),
+      );
+      return;
+    }
+
+    final matchId = (item['matchId'] as String?) ?? (item['id'] as String?) ?? '';
+    final partnerId = (item['partnerId'] as String?) ?? '';
+    final partnerNickname = (item['partnerNickname'] as String?) ?? 'Unknown';
+    final game = (item['game'] as String?) ?? profile.game;
+    final tier = (item['tier'] as String?) ?? profile.tier;
+    final playStyle = (item['playStyle'] as String?) ?? profile.playStyle;
+    final createdAt = (item['createdAt'] as int?) ?? DateTime.now().millisecondsSinceEpoch;
+
+    if (matchId.isEmpty || partnerId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('매칭 정보가 불완전하여 재입장할 수 없습니다.')),
+      );
+      return;
+    }
+
+    final match = MatchSession(
+      matchId: matchId,
+      userId: user.uid,
+      userNickname: profile.nickname,
+      partnerId: partnerId,
+      partnerNickname: partnerNickname,
+      game: game,
+      tier: tier,
+      playStyle: playStyle,
+      createdAt: createdAt,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChatRoomScreen(user: user, profile: profile, match: match),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1415,22 +1476,40 @@ class MatchHistoryScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final item = items[index];
                               final updatedAt = DateTime.fromMillisecondsSinceEpoch((item['updatedAt'] as int?) ?? 0);
-                              return Container(
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF101B2D),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: const Color(0x1AFFFFFF)),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('${item['game'] ?? ''} · ${item['partnerNickname'] ?? ''}', style: Theme.of(context).textTheme.titleMedium),
-                                    const SizedBox(height: 6),
-                                    Text('티어: ${item['tier'] ?? '-'} · 성향: ${item['playStyle'] ?? '-'}'),
-                                    const SizedBox(height: 6),
-                                    Text('상태: ${item['status'] ?? 'active'} · ${updatedAt.toLocal()}'),
-                                  ],
+                              final status = (item['status'] as String?) ?? 'active';
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () => _openChatFromHistory(context, item),
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF101B2D),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: const Color(0x1AFFFFFF)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              '${item['game'] ?? ''} · ${item['partnerNickname'] ?? ''}',
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ),
+                                          FilledButton.tonal(
+                                            onPressed: status == 'active' ? () => _openChatFromHistory(context, item) : null,
+                                            child: const Text('채팅 재입장'),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text('티어: ${item['tier'] ?? '-'} · 성향: ${item['playStyle'] ?? '-'}'),
+                                      const SizedBox(height: 6),
+                                      Text('상태: $status · ${updatedAt.toLocal()}'),
+                                    ],
+                                  ),
                                 ),
                               );
                             },

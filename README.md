@@ -163,6 +163,33 @@ flutter run -d chrome
 flutter build web
 ```
 
+### GitHub Actions로 Azure 자동 배포
+
+프로젝트에는 Azure Static Web Apps 자동 배포 워크플로가 포함되어 있습니다.
+
+워크플로 파일:
+- `.github/workflows/azure-static-web-apps.yml`
+
+동작 방식:
+- `main` 브랜치에 push되면 자동 실행
+- `main` 대상 Pull Request에도 자동 실행 (Preview 배포)
+- PR 종료 시 Preview 환경 자동 정리
+- `workflow_dispatch`로 수동 실행 가능
+- 품질 게이트: `flutter analyze` + `flutter test`
+- 보안 게이트: Trivy 기반 OWASP 관점 스캔(vuln/secret/misconfig)
+- `flutter build web --release` 결과를 Azure Static Web Apps로 배포
+- 동일 브랜치 중복 실행은 자동 취소(concurrency)
+
+사전 준비:
+1. Azure Portal에서 Static Web App 생성
+2. 해당 앱의 Deployment token 발급
+3. GitHub 저장소 Settings > Secrets and variables > Actions에 아래 시크릿 추가
+  - `AZURE_STATIC_WEB_APPS_API_TOKEN`
+
+참고:
+- 워크플로의 Trivy 보안 스캔에서 High/Critical 취약점이 검출되면 배포가 차단됩니다.
+- `test/` 폴더가 없으면 테스트 단계는 자동으로 스킵됩니다.
+
 ### 분석 / 테스트
 ```bash
 flutter analyze
